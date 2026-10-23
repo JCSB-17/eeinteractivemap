@@ -30,22 +30,20 @@
             </div>
 
             <div id="status-panel" class="status-panel">
-                <p class="status-item" style="margin-bottom: 12px;">
-                    <strong>Expected Graduation:</strong> <br>
-                    <span id="expected-graduation" class="highlight-text-green">Calculating...</span>
-                </p>
-                <div class="unit-stats-grid">
-                    <div class="unit-stat">
-                        <span class="unit-label">Total Units</span>
-                        <span id="units-total" class="unit-value">0</span>
-                    </div>
-                    <div class="unit-stat">
+                <p class="status-item"><strong>Expected Graduation:</strong> <br><span id="expected-graduation" class="highlight-text-green">Calculating...</span></p>
+                <hr class="status-divider">
+                <div class="unit-stats">
+                    <div class="unit-box">
                         <span class="unit-label">Completed</span>
-                        <span id="units-completed" class="unit-value highlight-text-green">0</span>
+                        <span class="unit-value" id="units-completed">0</span>
                     </div>
-                    <div class="unit-stat">
+                    <div class="unit-box">
                         <span class="unit-label">Remaining</span>
-                        <span id="units-remaining" class="unit-value unit-danger">0</span>
+                        <span class="unit-value" id="units-remaining">0</span>
+                    </div>
+                    <div class="unit-box">
+                        <span class="unit-label">Total</span>
+                        <span class="unit-value" id="units-total">0</span>
                     </div>
                 </div>
             </div>
@@ -61,7 +59,7 @@
             </div>
 
             <div id="completion-info" style="display: none;" class="info-box">
-                <p>Click courses on the map to permanently mark them as Completed. Your progress is saved automatically.</p>
+                <p>Click courses on the map to permanently mark them as Completed. Your progress is saved automatically via cookies.</p>
                 <button id="clear-completion-btn" class="btn-clear btn-clear-danger">Reset All Progress</button>
             </div>
 
