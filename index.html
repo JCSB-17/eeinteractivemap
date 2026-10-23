@@ -11,6 +11,7 @@
     <div class="header">
         <h1>Undergraduate Curriculum Map</h1>
         <div class="legend">
+            <span class="legend-item"><span class="color-box completed-box"></span> Completed</span>
             <span class="legend-item"><span class="color-box y1"></span> Year 1</span>
             <span class="legend-item"><span class="color-box y2"></span> Year 2</span>
             <span class="legend-item"><span class="color-box y3"></span> Year 3</span>
@@ -30,10 +31,20 @@
                 <div id="search-results" class="search-results"></div>
             </div>
 
+            <div class="grad-tracker">
+                <h3>Graduation Projection</h3>
+                <p>Expected Completion: <span id="grad-projection" class="highlight-text">-</span></p>
+                <p class="tracker-subtext">Based on remaining prerequisite chains.</p>
+            </div>
+
             <button id="multi-select-toggle" class="btn-toggle">Enable Multi-Select Mode</button>
             <div id="multi-select-info" style="display: none;">
                 <p><strong>Selected:</strong> <span id="selected-courses-list" class="highlight-text">None</span></p>
-                <button id="clear-selection-btn" class="btn-clear">Clear All</button>
+                <div class="completion-controls">
+                    <button id="mark-completed-btn" class="btn-success">Mark as Completed</button>
+                    <button id="mark-uncompleted-btn" class="btn-warning">Mark as Uncompleted</button>
+                </div>
+                <button id="clear-selection-btn" class="btn-clear">Clear Selection</button>
             </div>
 
             <p id="placeholder-text">Click any course node on the map to display its information and prerequisites.</p>
@@ -41,6 +52,7 @@
             <div id="course-card" style="display: none;">
                 <div class="card-header">
                     <h3 id="c-id"></h3>
+                    <span id="c-status" class="status-badge"></span>
                     <p id="c-title"></p>
                 </div>
                 
