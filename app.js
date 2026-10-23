@@ -154,17 +154,19 @@ function handleNodeSelect(nodeId) {
         });
         nodes.update(updates);
 
+        const isMobile = window.innerWidth <= 768;
+        
         network.setOptions({
             layout: {
                 hierarchical: {
-                    direction: 'LR',
+                    direction: isMobile ? 'UD' : 'LR',
                     sortMethod: 'directed',
                     nodeSpacing: 80,
-                    levelSeparation: 250
+                    levelSeparation: isMobile ? 120 : 250
                 }
             },
             edges: {
-                smooth: { type: 'cubicBezier', forceDirection: 'horizontal' }
+                smooth: { type: 'cubicBezier', forceDirection: isMobile ? 'vertical' : 'horizontal' }
             }
         });
     }
