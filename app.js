@@ -183,6 +183,16 @@ function handleNodeSelect(nodeId) {
                 }
             });
         }
+
+        setTimeout(() => {
+            network.fit({
+                nodes: Array.from(connectedSet),
+                animation: {
+                    duration: 600,
+                    easingFunction: "easeInOutQuad"
+                }
+            });
+        }, 50);
     }
 }
 
@@ -208,6 +218,15 @@ function handleNodeDeselect() {
             smooth: { type: 'cubicBezier', forceDirection: 'vertical' }
         }
     });
+
+    setTimeout(() => {
+        network.fit({
+            animation: {
+                duration: 600,
+                easingFunction: "easeInOutQuad"
+            }
+        });
+    }, 50);
 }
 
 network.on("selectNode", function (params) {
@@ -236,7 +255,6 @@ searchInput.addEventListener('input', (e) => {
         div.onclick = () => {
             network.selectNodes([match.id]);
             handleNodeSelect(match.id);
-            network.focus(match.id, { scale: 1.0, animation: true });
             searchResults.innerHTML = '';
             searchInput.value = '';
         };
