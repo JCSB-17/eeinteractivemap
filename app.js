@@ -64,7 +64,12 @@ const options = {
         }
     },
     physics: false,
-    interaction: { hover: true, navigationButtons: true, keyboard: true, dragNodes: false }
+    interaction: { 
+        hover: true, 
+        navigationButtons: true, 
+        keyboard: true,
+        dragNodes: false // Permanently stops text boxes and arrows from moving manually
+    }
 };
 
 const network = new vis.Network(container, data, options);
@@ -83,28 +88,27 @@ const searchResults = document.getElementById('search-results');
 
 const multiSelectToggle = document.getElementById('multi-select-toggle');
 const completionToggle = document.getElementById('completion-mode-toggle');
-const lockMapCheckbox = document.getElementById('lock-map-checkbox');
 const multiSelectInfo = document.getElementById('multi-select-info');
 const completionInfo = document.getElementById('completion-info');
 const selectedCoursesList = document.getElementById('selected-courses-list');
 const clearSelectionBtn = document.getElementById('clear-selection-btn');
 const clearCompletionBtn = document.getElementById('clear-completion-btn');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
+const lockMapCheckbox = document.getElementById('lock-map-checkbox');
 
 let isMultiSelectMode = false;
 let isCompletionMode = false;
 let activeNodes = [];
 
-function toggleMapLock() {
-    const locked = lockMapCheckbox.checked;
+lockMapCheckbox.addEventListener('change', (e) => {
+    const isLocked = e.target.checked;
     network.setOptions({
         interaction: {
-            dragView: !locked,
-            zoomView: !locked
+            dragView: !isLocked,
+            zoomView: !isLocked
         }
     });
-}
-lockMapCheckbox.addEventListener('change', toggleMapLock);
+});
 
 function updateNodeStyles() {
     const isDark = document.body.classList.contains('dark-mode');
@@ -227,21 +231,15 @@ multiSelectToggle.addEventListener('click', () => {
     if (isCompletionMode && isMultiSelectMode) completionToggle.click();
     
     if (isMultiSelectMode) {
-        lockMapCheckbox.checked = true;
-        toggleMapLock();
         multiSelectToggle.textContent = 'Disable Multi-Select Flow';
         multiSelectToggle.classList.add('active');
         multiSelectInfo.style.display = 'block';
     } else {
-        if (!isCompletionMode) {
-            lockMapCheckbox.checked = false;
-            toggleMapLock();
-        }
         multiSelectToggle.textContent = 'Enable Multi-Select Flow';
         multiSelectToggle.classList.remove('active');
         multiSelectInfo.style.display = 'none';
         if (activeNodes.length > 1) activeNodes = [activeNodes[activeNodes.length - 1]];
-        updateFlowView();
+        updateFlowView(true); // Suppresses map jump when disabling
     }
 });
 
@@ -250,18 +248,12 @@ completionToggle.addEventListener('click', () => {
     if (isMultiSelectMode && isCompletionMode) multiSelectToggle.click();
     
     if (isCompletionMode) {
-        lockMapCheckbox.checked = true;
-        toggleMapLock();
         completionToggle.textContent = 'Exit Completion Mode';
         completionToggle.classList.add('active');
         completionInfo.style.display = 'block';
         activeNodes = [];
-        updateFlowView();
+        updateFlowView(true); // Suppresses map jump when enabling
     } else {
-        if (!isMultiSelectMode) {
-            lockMapCheckbox.checked = false;
-            toggleMapLock();
-        }
         completionToggle.textContent = 'Mark Courses Completed';
         completionToggle.classList.remove('active');
         completionInfo.style.display = 'none';
@@ -321,7 +313,7 @@ function displayCourseDetails(nodeId) {
     cCoreqs.innerHTML = course.coreqs.length ? course.coreqs.map(c => `<li>${c}</li>`).join('') : '<span class="empty-list">None</span>';
 }
 
-function updateFlowView() {
+function updateFlowView(preventZoom = false) {
     if (activeNodes.length === 0) {
         placeholder.style.display = 'block';
         courseCard.style.display = 'none';
@@ -334,7 +326,7 @@ function updateFlowView() {
             edges: { smooth: { type: 'cubicBezier', forceDirection: isCurrentlyMobile ? 'vertical' : 'horizontal' } }
         });
 
-        if (!lockMapCheckbox.checked) {
+        if (!preventZoom) {
             setTimeout(() => network.fit({ animation: { duration: 600, easingFunction: "easeInOutQuad" } }), 50);
         }
         return;
@@ -357,7 +349,7 @@ function updateFlowView() {
 
     network.selectNodes(activeNodes);
     
-    if (!lockMapCheckbox.checked) {
+    if (!preventZoom) {
         setTimeout(() => network.fit({ nodes: Array.from(allConnected), animation: { duration: 600, easingFunction: "easeInOutQuad" } }), 50);
     }
 }
@@ -387,11 +379,11 @@ network.on("click", function (params) {
             if (index > -1) activeNodes.splice(index, 1);
             else activeNodes.push(clickedNode);
             selectedCoursesList.textContent = activeNodes.length > 0 ? activeNodes.join(', ') : 'None';
-            updateFlowView();
+            updateFlowView(lockMapCheckbox.checked); // Honors freeze override
         }
     } else {
         activeNodes = clickedNode ? [clickedNode] : [];
-        updateFlowView();
+        updateFlowView(lockMapCheckbox.checked);
     }
 });
 
@@ -406,15 +398,15 @@ searchInput.addEventListener('input', (e) => {
         div.textContent = `${match.id} - ${match.title}`;
         div.onclick = () => {
             if (isCompletionMode) {
-                network.focus(match.id, { scale: 1.0, animation: true });
+                if(!lockMapCheckbox.checked) network.focus(match.id, { scale: 1.0, animation: true });
                 displayCourseDetails(match.id);
             } else if (isMultiSelectMode) {
                 if (!activeNodes.includes(match.id)) activeNodes.push(match.id);
                 selectedCoursesList.textContent = activeNodes.join(', ');
-                updateFlowView();
+                updateFlowView(lockMapCheckbox.checked);
             } else {
                 activeNodes = [match.id];
-                updateFlowView();
+                updateFlowView(lockMapCheckbox.checked);
             }
             searchResults.innerHTML = '';
             searchInput.value = '';
