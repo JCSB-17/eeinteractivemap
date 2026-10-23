@@ -491,3 +491,83 @@ body.dark-mode .grad-tracker {
 
 body.dark-mode .grad-tracker h3 { color: #e0e0e0; }
 body.dark-mode .tracker-subtext { color: #aaa; }
+
+/* Sidebar Modifications */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.btn-toggle {
+    margin-bottom: 0;
+}
+
+.btn-primary { background-color: #3498db; }
+.btn-primary:hover { background-color: #2980b9; }
+.btn-primary.active { background-color: #e74c3c; }
+
+.btn-success { background-color: #2ecc71; color: #10301c; }
+.btn-success:hover { background-color: #27ae60; }
+.btn-success.active { background-color: #e67e22; color: white;}
+
+.btn-clear-danger { background-color: #e74c3c; margin-top: 10px; }
+.btn-clear-danger:hover { background-color: #c0392b; }
+
+.status-panel {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.highlight-text-green {
+    color: #16a085;
+    font-weight: 800;
+    font-size: 1.25rem;
+    display: block;
+    margin-top: 5px;
+}
+
+.info-box {
+    background-color: #fcf3cf;
+    border: 1px solid #f1c40f;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+    color: #7d6608;
+    line-height: 1.4;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 20px 0;
+}
+
+.completed-box { background-color: #bdc3c7; border: 1px solid #7f8c8d; }
+
+/* Dark Mode Extensions */
+body.dark-mode .status-panel {
+    background-color: #1a2a24;
+    border-color: #117a65;
+}
+
+body.dark-mode .highlight-text-green {
+    color: #48c9b0;
+}
+
+body.dark-mode .info-box {
+    background-color: #3f3113;
+    border-color: #b9770e;
+    color: #f4d03f;
+}
+
+body.dark-mode .divider {
+    background: #333;
+}
