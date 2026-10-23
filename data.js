@@ -108,5 +108,10 @@ const curriculumData = [
   { id: "EEA123X", title: "ELECTRICAL ENGINEERING PROFESSIONAL SUBJECTS EXIT EXAM", year: 4, term: 2, units: 0, prereqs: ["EEA118-4"], coreqs: ["EEA114P-4", "EEA115D", "EEA116F-4"] },
   { id: "MSE021", title: "FUNDAMENTALS OF MATERIAL SCIENCE AND ENGINEERING", year: 4, term: 2, units: 2, prereqs: ["CM011", "CM011L", "MEC32-06"], coreqs: [] },
   { id: "EEA199R", title: "ON THE JOB TRAINING", year: 4, term: 3, units: 3, prereqs: ["EEA114P-4"], coreqs: [] },
-  { id: "SGE100X", title: "STUDENT GLOBAL EXPERIENCE", year: 4, term: 3, units: 0, prereqs: [], coreqs: [] }
+  { id: "SGE100X", title: "STUDENT GLOBAL EXPERIENCE", year: 4, term: 3, units: 0, prereqs: [], coreqs: [] },
+
+  // Specialization: Power System Protection
+  { id: "EEA134", title: "POWER SYSTEM PROTECTION 1", year: 3, term: 4, units: 3, prereqs: [], coreqs: [] },
+  { id: "EEA135", title: "POWER SYSTEM PROTECTION 2", year: 4, term: 1, units: 3, prereqs: ["EEA134"], coreqs: [] },
+  { id: "EEA136", title: "POWER SYSTEM PROTECTION 3", year: 4, term: 2, units: 3, prereqs: ["EEA135"], coreqs: [] }
 ];
