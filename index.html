@@ -30,7 +30,24 @@
             </div>
 
             <div id="status-panel" class="status-panel">
-                <p class="status-item"><strong>Expected Graduation:</strong> <br><span id="expected-graduation" class="highlight-text-green">Calculating...</span></p>
+                <p class="status-item" style="margin-bottom: 12px;">
+                    <strong>Expected Graduation:</strong> <br>
+                    <span id="expected-graduation" class="highlight-text-green">Calculating...</span>
+                </p>
+                <div class="unit-stats-grid">
+                    <div class="unit-stat">
+                        <span class="unit-label">Total Units</span>
+                        <span id="units-total" class="unit-value">0</span>
+                    </div>
+                    <div class="unit-stat">
+                        <span class="unit-label">Completed</span>
+                        <span id="units-completed" class="unit-value highlight-text-green">0</span>
+                    </div>
+                    <div class="unit-stat">
+                        <span class="unit-label">Remaining</span>
+                        <span id="units-remaining" class="unit-value unit-danger">0</span>
+                    </div>
+                </div>
             </div>
 
             <div class="action-buttons">
