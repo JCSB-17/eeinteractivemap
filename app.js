@@ -134,75 +134,129 @@ function updateGraduationEstimate() {
     const gradElement = document.getElementById('expected-graduation');
     updateUnitStats();
     
-    if (completedCourses.size === 0) {
-        gradElement.textContent = "Year 4, Term 3";
-        return;
-    }
     if (completedCourses.size === curriculumData.length) {
         gradElement.textContent = "Graduated!";
         return;
     }
 
-    let maxCompletedLevel = 0;
+    // Helper functions to map original curriculum structure to absolute terms
+    function getOriginalAbsTerm(y, t) {
+        if (y === 1) return t; // Y1: Terms 1, 2, 3
+        if (y === 2) return 3 + t; // Y2: Terms 4, 5, 6
+        return 6 + ((y - 3) * 4) + t; // Y3+: Quadmester formatting starting at Term 7
+    }
+
+    function getTermInfo(absTerm) {
+        // Years 1 & 2: Trimester, 21 Units Max
+        if (absTerm <= 3) return { year: 1, term: absTerm, maxUnits: 21 };
+        if (absTerm <= 6) return { year: 2, term: absTerm - 3, maxUnits: 21 };
+        
+        // Year 3 & beyond: Quadmester, 18 Units Max
+        const postY2 = absTerm - 6;
+        const y = 3 + Math.floor((postY2 - 1) / 4);
+        const t = ((postY2 - 1) % 4) + 1;
+        return { year: y, term: t, maxUnits: 18 };
+    }
+
+    // Calculate start point for the simulation based on highest completed chronological term
+    let maxCompletedAbsTerm = 0;
     completedCourses.forEach(id => {
-        const c = curriculumData.find(course => course.id === id);
+        const c = curriculumData.find(x => x.id === id);
         if (c) {
-            const lvl = ((c.year - 1) * 4) + c.term;
-            if (lvl > maxCompletedLevel) maxCompletedLevel = lvl;
+            const absTerm = getOriginalAbsTerm(c.year, c.term);
+            if (absTerm > maxCompletedAbsTerm) maxCompletedAbsTerm = absTerm;
         }
     });
 
-    const nextTerm = maxCompletedLevel + 1;
-    const levels = {};
-    
-    curriculumData.forEach(c => {
-        if (!completedCourses.has(c.id)) {
-            let officialLevel = ((c.year - 1) * 4) + c.term;
-            levels[c.id] = officialLevel < nextTerm ? nextTerm : officialLevel;
-        }
-    });
+    let simulationAbsTerm = maxCompletedAbsTerm;
+    let takenInSim = new Set(completedCourses);
+    let remainingSim = curriculumData.filter(c => !takenInSim.has(c.id));
 
-    let changed = true;
-    let iterations = 0;
-    while (changed && iterations < 100) {
-        changed = false;
-        iterations++;
-        curriculumData.forEach(c => {
-            if (!completedCourses.has(c.id)) {
-                let maxPrereqLevel = 0;
-                
-                c.prereqs.forEach(pId => {
-                    if (!completedCourses.has(pId) && levels[pId] !== undefined) {
-                        if (levels[pId] > maxPrereqLevel) maxPrereqLevel = levels[pId];
+    // Priority sorting: Attempt to clear backlogs from oldest terms first
+    remainingSim.sort((a, b) => getOriginalAbsTerm(a.year, a.term) - getOriginalAbsTerm(b.year, b.term));
+
+    let loops = 0;
+    // Simulate term-by-term forward progression
+    while (remainingSim.length > 0 && loops < 50) {
+        loops++;
+        simulationAbsTerm++;
+        const termInfo = getTermInfo(simulationAbsTerm);
+        let unitsThisTerm = 0;
+        let coursesThisTerm = [];
+
+        let i = 0;
+        while (i < remainingSim.length) {
+            let course = remainingSim[i];
+            let canTake = true;
+
+            // Strict Pre-requisite validation
+            if (course.prereqs) {
+                for (let p of course.prereqs) {
+                    if (!takenInSim.has(p)) {
+                        canTake = false;
+                        break;
                     }
-                });
-                
-                if (maxPrereqLevel > 0 && maxPrereqLevel + 1 > levels[c.id]) {
-                    levels[c.id] = maxPrereqLevel + 1;
-                    changed = true;
                 }
-                
-                c.coreqs.forEach(coreqId => {
-                    if (!completedCourses.has(coreqId) && levels[coreqId] !== undefined) {
-                        if (levels[coreqId] > levels[c.id]) {
-                            levels[c.id] = levels[coreqId];
-                            changed = true;
-                        }
-                    }
-                });
             }
-        });
+
+            if (!canTake) { i++; continue; }
+
+            // Dynamic Co-requisite validation & bundling
+            let coreqsNeededThisTerm = [];
+            if (course.coreqs) {
+                for (let cReq of course.coreqs) {
+                    if (!takenInSim.has(cReq) && !coursesThisTerm.includes(cReq)) {
+                        let cReqObj = remainingSim.find(x => x.id === cReq);
+                        if (!cReqObj) { canTake = false; break; } // Coreq missing from remaining list
+                        
+                        let reqPrereqMet = true;
+                        if (cReqObj.prereqs) {
+                            for (let rp of cReqObj.prereqs) {
+                                if (!takenInSim.has(rp)) { reqPrereqMet = false; break; }
+                            }
+                        }
+                        if (!reqPrereqMet) { canTake = false; break; }
+                        coreqsNeededThisTerm.push(cReqObj);
+                    }
+                }
+            }
+
+            if (!canTake) { i++; continue; }
+
+            // Enforce Strict Unit Limits for Current Term Rule (18 vs 21)
+            let extraUnits = Number(course.units) || 0;
+            for (let cReqObj of coreqsNeededThisTerm) extraUnits += (Number(cReqObj.units) || 0);
+
+            if (unitsThisTerm + extraUnits <= termInfo.maxUnits) {
+                coursesThisTerm.push(course.id);
+                unitsThisTerm += (Number(course.units) || 0);
+
+                for (let cReqObj of coreqsNeededThisTerm) {
+                    if (!coursesThisTerm.includes(cReqObj.id)) {
+                        coursesThisTerm.push(cReqObj.id);
+                        unitsThisTerm += (Number(cReqObj.units) || 0);
+                    }
+                }
+
+                // Isolate successfully added courses and restart scan to fill remaining unit gaps
+                remainingSim = remainingSim.filter(x => !coursesThisTerm.includes(x.id));
+                i = 0;
+            } else {
+                i++;
+            }
+        }
+
+        // Commit taken subjects to pool to unlock prerequisites for next iteration
+        coursesThisTerm.forEach(id => takenInSim.add(id));
+
+        if (coursesThisTerm.length === 0 && remainingSim.length > 0) {
+            console.error("Simulation Deadlock Detected: Cannot resolve remaining subjects.", remainingSim);
+            break;
+        }
     }
 
-    let maxLevel = 0;
-    for (let id in levels) {
-        if (levels[id] > maxLevel) maxLevel = levels[id];
-    }
-
-    const expYear = Math.ceil(maxLevel / 4);
-    const expTerm = maxLevel % 4 === 0 ? 4 : maxLevel % 4;
-
-    gradElement.textContent = `Year ${expYear}, Term ${expTerm}`;
+    const finalTermInfo = getTermInfo(simulationAbsTerm);
+    gradElement.textContent = `Year ${finalTermInfo.year}, Term ${finalTermInfo.term}`;
 }
 
 darkModeToggle.addEventListener('click', () => {
@@ -251,7 +305,7 @@ clearSelectionBtn.addEventListener('click', () => {
 });
 
 clearCompletionBtn.addEventListener('click', () => {
-    if(confirm("Are you sure you want to reset all completed courses?")) {
+    if (confirm("Are you sure you want to reset all completed courses?")) {
         completedCourses.clear();
         setCookie('completedCourses', JSON.stringify([]));
         updateNodeStyles();
