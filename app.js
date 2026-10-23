@@ -154,21 +154,35 @@ function handleNodeSelect(nodeId) {
         });
         nodes.update(updates);
 
-        const isMobile = window.innerWidth <= 768;
-        
-        network.setOptions({
-            layout: {
-                hierarchical: {
-                    direction: isMobile ? 'UD' : 'LR',
-                    sortMethod: 'directed',
-                    nodeSpacing: 80,
-                    levelSeparation: isMobile ? 120 : 250
+        if (window.innerWidth <= 768) {
+            network.setOptions({
+                layout: {
+                    hierarchical: {
+                        direction: 'UD',
+                        sortMethod: 'directed',
+                        nodeSpacing: 80,
+                        levelSeparation: 150
+                    }
+                },
+                edges: {
+                    smooth: { type: 'cubicBezier', forceDirection: 'vertical' }
                 }
-            },
-            edges: {
-                smooth: { type: 'cubicBezier', forceDirection: isMobile ? 'vertical' : 'horizontal' }
-            }
-        });
+            });
+        } else {
+            network.setOptions({
+                layout: {
+                    hierarchical: {
+                        direction: 'LR',
+                        sortMethod: 'directed',
+                        nodeSpacing: 80,
+                        levelSeparation: 250
+                    }
+                },
+                edges: {
+                    smooth: { type: 'cubicBezier', forceDirection: 'horizontal' }
+                }
+            });
+        }
     }
 }
 
