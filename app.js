@@ -89,6 +89,37 @@ const cCoreqs = document.getElementById('c-coreqs');
 const searchInput = document.getElementById('search-input');
 const searchResults = document.getElementById('search-results');
 
+const multiSelectToggle = document.getElementById('multi-select-toggle');
+const multiSelectInfo = document.getElementById('multi-select-info');
+const selectedCoursesList = document.getElementById('selected-courses-list');
+const clearSelectionBtn = document.getElementById('clear-selection-btn');
+
+let isMultiSelectMode = false;
+let activeNodes = [];
+
+multiSelectToggle.addEventListener('click', () => {
+    isMultiSelectMode = !isMultiSelectMode;
+    if (isMultiSelectMode) {
+        multiSelectToggle.textContent = 'Disable Multi-Select Mode';
+        multiSelectToggle.classList.add('active');
+        multiSelectInfo.style.display = 'block';
+    } else {
+        multiSelectToggle.textContent = 'Enable Multi-Select Mode';
+        multiSelectToggle.classList.remove('active');
+        multiSelectInfo.style.display = 'none';
+        if (activeNodes.length > 1) {
+            activeNodes = [activeNodes[activeNodes.length - 1]];
+        }
+        updateFlowView();
+    }
+});
+
+clearSelectionBtn.addEventListener('click', () => {
+    activeNodes = [];
+    selectedCoursesList.textContent = 'None';
+    updateFlowView();
+});
+
 function getConnectedNodes(startNodeId) {
     const connected = new Set();
     connected.add(startNodeId);
@@ -118,134 +149,130 @@ function getConnectedNodes(startNodeId) {
     return connected;
 }
 
-function handleNodeSelect(nodeId) {
+function displayCourseDetails(nodeId) {
     const course = curriculumData.find(c => c.id === nodeId);
+    if (!course) return;
+
+    placeholder.style.display = 'none';
+    courseCard.style.display = 'block';
     
-    if (course) {
-        placeholder.style.display = 'none';
-        courseCard.style.display = 'block';
-        
-        cId.textContent = course.id;
-        cTitle.textContent = course.title;
-        cYear.textContent = course.year;
-        cTerm.textContent = course.term;
-        cUnits.textContent = course.units;
-        
-        cPrereqs.innerHTML = '';
-        if (course.prereqs.length > 0) {
-            course.prereqs.forEach(p => {
-                const li = document.createElement('li');
-                li.textContent = p;
-                cPrereqs.appendChild(li);
-            });
-        } else {
-            cPrereqs.innerHTML = '<span class="empty-list">None</span>';
-        }
-        
-        cCoreqs.innerHTML = '';
-        if (course.coreqs.length > 0) {
-            course.coreqs.forEach(c => {
-                const li = document.createElement('li');
-                li.textContent = c;
-                cCoreqs.appendChild(li);
-            });
-        } else {
-            cCoreqs.innerHTML = '<span class="empty-list">None</span>';
-        }
-
-        const connectedSet = getConnectedNodes(nodeId);
-        const updates = [];
-        nodes.forEach(n => {
-            updates.push({ id: n.id, hidden: !connectedSet.has(n.id) });
+    cId.textContent = course.id;
+    cTitle.textContent = course.title;
+    cYear.textContent = course.year;
+    cTerm.textContent = course.term;
+    cUnits.textContent = course.units;
+    
+    cPrereqs.innerHTML = '';
+    if (course.prereqs.length > 0) {
+        course.prereqs.forEach(p => {
+            const li = document.createElement('li');
+            li.textContent = p;
+            cPrereqs.appendChild(li);
         });
-        nodes.update(updates);
-
-        if (window.innerWidth <= 768) {
-            network.setOptions({
-                layout: {
-                    hierarchical: {
-                        direction: 'UD',
-                        sortMethod: 'directed',
-                        nodeSpacing: 80,
-                        levelSeparation: 150
-                    }
-                },
-                edges: {
-                    smooth: { type: 'cubicBezier', forceDirection: 'vertical' }
-                }
-            });
-        } else {
-            network.setOptions({
-                layout: {
-                    hierarchical: {
-                        direction: 'LR',
-                        sortMethod: 'directed',
-                        nodeSpacing: 80,
-                        levelSeparation: 250
-                    }
-                },
-                edges: {
-                    smooth: { type: 'cubicBezier', forceDirection: 'horizontal' }
-                }
-            });
-        }
-
-        setTimeout(() => {
-            network.fit({
-                nodes: Array.from(connectedSet),
-                animation: {
-                    duration: 600,
-                    easingFunction: "easeInOutQuad"
-                }
-            });
-        }, 50);
+    } else {
+        cPrereqs.innerHTML = '<span class="empty-list">None</span>';
+    }
+    
+    cCoreqs.innerHTML = '';
+    if (course.coreqs.length > 0) {
+        course.coreqs.forEach(c => {
+            const li = document.createElement('li');
+            li.textContent = c;
+            cCoreqs.appendChild(li);
+        });
+    } else {
+        cCoreqs.innerHTML = '<span class="empty-list">None</span>';
     }
 }
 
-function handleNodeDeselect() {
-    placeholder.style.display = 'block';
-    courseCard.style.display = 'none';
+function updateFlowView() {
+    if (activeNodes.length === 0) {
+        placeholder.style.display = 'block';
+        courseCard.style.display = 'none';
+        
+        nodes.forEach(n => nodes.update({ id: n.id, hidden: false }));
+        
+        const isCurrentlyMobile = window.innerWidth <= 768;
+        network.setOptions({
+            layout: {
+                hierarchical: {
+                    direction: isCurrentlyMobile ? 'UD' : 'LR',
+                    sortMethod: 'directed',
+                    nodeSpacing: isCurrentlyMobile ? 120 : 80,
+                    levelSeparation: isCurrentlyMobile ? 120 : 250
+                }
+            },
+            edges: {
+                smooth: { type: 'cubicBezier', forceDirection: isCurrentlyMobile ? 'vertical' : 'horizontal' }
+            }
+        });
+
+        setTimeout(() => network.fit({ animation: { duration: 600, easingFunction: "easeInOutQuad" } }), 50);
+        return;
+    }
+
+    displayCourseDetails(activeNodes[activeNodes.length - 1]);
+
+    const allConnected = new Set();
+    activeNodes.forEach(id => {
+        const connectedSet = getConnectedNodes(id);
+        connectedSet.forEach(n => allConnected.add(n));
+    });
+
     const updates = [];
     nodes.forEach(n => {
-        updates.push({ id: n.id, hidden: false });
+        updates.push({ id: n.id, hidden: !allConnected.has(n.id) });
     });
     nodes.update(updates);
 
     const isCurrentlyMobile = window.innerWidth <= 768;
-    
     network.setOptions({
         layout: {
             hierarchical: {
                 direction: isCurrentlyMobile ? 'UD' : 'LR',
                 sortMethod: 'directed',
-                nodeSpacing: isCurrentlyMobile ? 120 : 80,
-                levelSeparation: isCurrentlyMobile ? 120 : 250
+                nodeSpacing: 80,
+                levelSeparation: isCurrentlyMobile ? 150 : 250
             }
         },
         edges: {
-            smooth: { 
-                type: 'cubicBezier', 
-                forceDirection: isCurrentlyMobile ? 'vertical' : 'horizontal' 
-            }
+            smooth: { type: 'cubicBezier', forceDirection: isCurrentlyMobile ? 'vertical' : 'horizontal' }
         }
     });
 
+    network.selectNodes(activeNodes);
+
     setTimeout(() => {
         network.fit({
-            animation: {
-                duration: 600,
-                easingFunction: "easeInOutQuad"
-            }
+            nodes: Array.from(allConnected),
+            animation: { duration: 600, easingFunction: "easeInOutQuad" }
         });
     }, 50);
 }
 
-network.on("selectNode", function (params) {
-    handleNodeSelect(params.nodes[0]);
-});
+network.on("click", function (params) {
+    const clickedNode = params.nodes.length > 0 ? params.nodes[0] : null;
 
-network.on("deselectNode", function () {
-    handleNodeDeselect();
+    if (isMultiSelectMode) {
+        if (clickedNode) {
+            const index = activeNodes.indexOf(clickedNode);
+            if (index > -1) {
+                activeNodes.splice(index, 1);
+            } else {
+                activeNodes.push(clickedNode);
+            }
+            selectedCoursesList.textContent = activeNodes.length > 0 ? activeNodes.join(', ') : 'None';
+            updateFlowView();
+        }
+    } else {
+        if (clickedNode) {
+            activeNodes = [clickedNode];
+            updateFlowView();
+        } else {
+            activeNodes = [];
+            updateFlowView();
+        }
+    }
 });
 
 searchInput.addEventListener('input', (e) => {
@@ -264,8 +291,15 @@ searchInput.addEventListener('input', (e) => {
         div.className = 'search-result-item';
         div.textContent = `${match.id} - ${match.title}`;
         div.onclick = () => {
-            network.selectNodes([match.id]);
-            handleNodeSelect(match.id);
+            if (isMultiSelectMode) {
+                if (!activeNodes.includes(match.id)) {
+                    activeNodes.push(match.id);
+                }
+                selectedCoursesList.textContent = activeNodes.join(', ');
+            } else {
+                activeNodes = [match.id];
+            }
+            updateFlowView();
             searchResults.innerHTML = '';
             searchInput.value = '';
         };
