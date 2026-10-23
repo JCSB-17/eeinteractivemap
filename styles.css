@@ -93,3 +93,34 @@ body.dark-mode .divider { background: #333; }
     .sidebar { flex: none; max-width: 100%; width: 100%; height: 50vh; border-left: none; border-top: 2px solid #bdc3c7; padding: 15px; }
     .search-results { max-height: 140px; }
 }
+
+.lock-map-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    margin-top: 5px;
+    cursor: pointer;
+    padding: 10px;
+    background: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.lock-map-toggle:hover {
+    background: #d1f2eb;
+}
+
+body.dark-mode .lock-map-toggle {
+    color: #e0e0e0;
+    background: #1a2a24;
+    border-color: #117a65;
+}
+
+body.dark-mode .lock-map-toggle:hover {
+    background: #117a65;
+}
