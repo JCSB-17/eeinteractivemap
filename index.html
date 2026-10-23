@@ -11,11 +11,11 @@
     <div class="header">
         <h1>Undergraduate Curriculum Map</h1>
         <div class="legend">
-            <span class="legend-item"><span class="color-box completed-box"></span> Completed</span>
             <span class="legend-item"><span class="color-box y1"></span> Year 1</span>
             <span class="legend-item"><span class="color-box y2"></span> Year 2</span>
             <span class="legend-item"><span class="color-box y3"></span> Year 3</span>
             <span class="legend-item"><span class="color-box y4"></span> Year 4</span>
+            <span class="legend-item"><span class="color-box completed-box"></span> Completed</span>
         </div>
         <button id="dark-mode-toggle" class="btn-dark-mode">Dark Mode</button>
     </div>
@@ -24,35 +24,36 @@
         <div id="curriculum-graph" class="graph-pane"></div>
         
         <div id="details-pane" class="sidebar">
-            <h2>Course Details</h2>
-            
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search by course code or title...">
                 <div id="search-results" class="search-results"></div>
             </div>
 
-            <div class="grad-tracker">
-                <h3>Graduation Projection</h3>
-                <p>Expected Completion: <span id="grad-projection" class="highlight-text">-</span></p>
-                <p class="tracker-subtext">Based on remaining prerequisite chains.</p>
+            <div id="status-panel" class="status-panel">
+                <p class="status-item"><strong>Expected Graduation:</strong> <br><span id="expected-graduation" class="highlight-text-green">Calculating...</span></p>
             </div>
 
-            <button id="multi-select-toggle" class="btn-toggle">Enable Multi-Select Mode</button>
+            <div class="action-buttons">
+                <button id="multi-select-toggle" class="btn-toggle btn-primary">Enable Multi-Select Flow</button>
+                <button id="completion-mode-toggle" class="btn-toggle btn-success">Mark Courses Completed</button>
+            </div>
+
             <div id="multi-select-info" style="display: none;">
                 <p><strong>Selected:</strong> <span id="selected-courses-list" class="highlight-text">None</span></p>
-                <div class="completion-controls">
-                    <button id="mark-completed-btn" class="btn-success">Mark as Completed</button>
-                    <button id="mark-uncompleted-btn" class="btn-warning">Mark as Uncompleted</button>
-                </div>
-                <button id="clear-selection-btn" class="btn-clear">Clear Selection</button>
+                <button id="clear-selection-btn" class="btn-clear">Clear Flow Selection</button>
             </div>
 
+            <div id="completion-info" style="display: none;" class="info-box">
+                <p>Click courses on the map to permanently mark them as Completed. Your progress is saved automatically.</p>
+                <button id="clear-completion-btn" class="btn-clear btn-clear-danger">Reset All Progress</button>
+            </div>
+
+            <hr class="divider">
             <p id="placeholder-text">Click any course node on the map to display its information and prerequisites.</p>
             
             <div id="course-card" style="display: none;">
                 <div class="card-header">
                     <h3 id="c-id"></h3>
-                    <span id="c-status" class="status-badge"></span>
                     <p id="c-title"></p>
                 </div>
                 
