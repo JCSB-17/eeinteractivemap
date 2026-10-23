@@ -1,11 +1,23 @@
+function setCookie(name, value, days = 365) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+}
+
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+
+const savedData = getCookie('completedCourses');
+let completedCourses = new Set(savedData ? JSON.parse(savedData) : []);
+
 const yearColors = {
     1: { background: '#e3f2fd', border: '#90caf9' },
     2: { background: '#e8f5e9', border: '#a5d6a7' },
     3: { background: '#fff3e0', border: '#ffcc80' },
     4: { background: '#fce4ec', border: '#f48fb1' }
 };
-
-let completedCourses = new Set(JSON.parse(localStorage.getItem('completedCourses')) || []);
 
 const nodes = new vis.DataSet(
     curriculumData.map(course => {
@@ -88,7 +100,6 @@ function updateNodeStyles() {
     
     curriculumData.forEach(course => {
         const isCompleted = completedCourses.has(course.id);
-        
         const bgColor = isCompleted ? (isDark ? '#2c3e50' : '#bdc3c7') : yearColors[course.year].background;
         const borderColor = isCompleted ? (isDark ? '#1a252f' : '#7f8c8d') : yearColors[course.year].border;
         const fontColor = isCompleted ? (isDark ? '#7f8c8d' : '#ffffff') : (isDark ? '#e0e0e0' : '#000000');
@@ -102,8 +113,26 @@ function updateNodeStyles() {
     nodes.update(updates);
 }
 
+function updateUnitStats() {
+    let total = 0;
+    let completed = 0;
+
+    curriculumData.forEach(course => {
+        const courseUnits = Number(course.units) || 0;
+        total += courseUnits;
+        if (completedCourses.has(course.id)) {
+            completed += courseUnits;
+        }
+    });
+
+    document.getElementById('units-total').textContent = total;
+    document.getElementById('units-completed').textContent = completed;
+    document.getElementById('units-remaining').textContent = total - completed;
+}
+
 function updateGraduationEstimate() {
     const gradElement = document.getElementById('expected-graduation');
+    updateUnitStats();
     
     if (completedCourses.size === 0) {
         gradElement.textContent = "Year 4, Term 3";
@@ -224,7 +253,7 @@ clearSelectionBtn.addEventListener('click', () => {
 clearCompletionBtn.addEventListener('click', () => {
     if(confirm("Are you sure you want to reset all completed courses?")) {
         completedCourses.clear();
-        localStorage.setItem('completedCourses', JSON.stringify([]));
+        setCookie('completedCourses', JSON.stringify([]));
         updateNodeStyles();
         updateGraduationEstimate();
     }
@@ -312,7 +341,7 @@ network.on("click", function (params) {
             if (completedCourses.has(clickedNode)) completedCourses.delete(clickedNode);
             else completedCourses.add(clickedNode);
             
-            localStorage.setItem('completedCourses', JSON.stringify(Array.from(completedCourses)));
+            setCookie('completedCourses', JSON.stringify(Array.from(completedCourses)));
             updateNodeStyles();
             updateGraduationEstimate();
             displayCourseDetails(clickedNode);
@@ -369,6 +398,5 @@ document.addEventListener('click', (e) => {
     if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.innerHTML = '';
 });
 
-// Initialization Commands
 updateNodeStyles();
 updateGraduationEstimate();
