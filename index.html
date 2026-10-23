@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum Manager</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Undergraduate Curriculum Map</h1>
+        <div class="legend">
+            <span class="legend-item"><span class="color-box y1"></span> Year 1</span>
+            <span class="legend-item"><span class="color-box y2"></span> Year 2</span>
+            <span class="legend-item"><span class="color-box y3"></span> Year 3</span>
+            <span class="legend-item"><span class="color-box y4"></span> Year 4</span>
+        </div>
+    </div>
+    
+    <div class="app-container">
+        <div id="curriculum-graph" class="graph-pane"></div>
+        
+        <div id="details-pane" class="sidebar">
+            <h2>Course Details</h2>
+            
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search by course code or title...">
+                <div id="search-results" class="search-results"></div>
+            </div>
+
+            <p id="placeholder-text">Click any course node on the map to display its information and prerequisites.</p>
+            
+            <div id="course-card" style="display: none;">
+                <div class="card-header">
+                    <h3 id="c-id"></h3>
+                    <p id="c-title"></p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Year</span>
+                        <span class="stat-value" id="c-year"></span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Term</span>
+                        <span class="stat-value" id="c-term"></span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Units</span>
+                        <span class="stat-value" id="c-units"></span>
+                    </div>
+                </div>
+
+                <div class="requirements">
+                    <h4>Pre-requisites</h4>
+                    <ul id="c-prereqs"></ul>
+                    
+                    <h4>Co-requisites</h4>
+                    <ul id="c-coreqs"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
