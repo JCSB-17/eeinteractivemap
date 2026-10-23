@@ -242,3 +242,65 @@ body {
         max-height: 140px;
     }
 }
+
+.btn-toggle {
+    width: 100%;
+    padding: 10px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    transition: background-color 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-toggle:hover {
+    background-color: #27ae60;
+}
+
+.btn-toggle.active {
+    background-color: #e74c3c;
+}
+
+.btn-toggle.active:hover {
+    background-color: #c0392b;
+}
+
+#multi-select-info {
+    background-color: #f8f9fa;
+    border: 1px solid #bdc3c7;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.highlight-text {
+    color: #2980b9;
+    font-family: monospace;
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.btn-clear {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background-color: #7f8c8d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-clear:hover {
+    background-color: #95a5a6;
+}
