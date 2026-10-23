@@ -30,8 +30,7 @@ curriculumData.forEach(course => {
                 from: prereq,
                 to: course.id,
                 arrows: 'to',
-                color: { color: '#bdc3c7' },
-                smooth: { type: 'cubicBezier', forceDirection: 'vertical' }
+                color: { color: '#bdc3c7' }
             });
         });
     }
@@ -43,8 +42,7 @@ curriculumData.forEach(course => {
                 to: course.id,
                 arrows: 'to',
                 dashes: true,
-                color: { color: '#e74c3c' },
-                smooth: { type: 'cubicBezier', forceDirection: 'vertical' }
+                color: { color: '#e74c3c' }
             });
         });
     }
@@ -52,13 +50,21 @@ curriculumData.forEach(course => {
 
 const container = document.getElementById('curriculum-graph');
 const data = { nodes: nodes, edges: edges };
+const isMobile = window.innerWidth <= 768;
+
 const options = {
     layout: {
         hierarchical: {
-            direction: 'UD',
+            direction: isMobile ? 'UD' : 'LR',
             sortMethod: 'directed',
-            nodeSpacing: 120,
-            levelSeparation: 120
+            nodeSpacing: isMobile ? 120 : 80,
+            levelSeparation: isMobile ? 120 : 250
+        }
+    },
+    edges: {
+        smooth: {
+            type: 'cubicBezier',
+            forceDirection: isMobile ? 'vertical' : 'horizontal'
         }
     },
     physics: false,
@@ -205,17 +211,22 @@ function handleNodeDeselect() {
     });
     nodes.update(updates);
 
+    const isCurrentlyMobile = window.innerWidth <= 768;
+    
     network.setOptions({
         layout: {
             hierarchical: {
-                direction: 'UD',
+                direction: isCurrentlyMobile ? 'UD' : 'LR',
                 sortMethod: 'directed',
-                nodeSpacing: 120,
-                levelSeparation: 120
+                nodeSpacing: isCurrentlyMobile ? 120 : 80,
+                levelSeparation: isCurrentlyMobile ? 120 : 250
             }
         },
         edges: {
-            smooth: { type: 'cubicBezier', forceDirection: 'vertical' }
+            smooth: { 
+                type: 'cubicBezier', 
+                forceDirection: isCurrentlyMobile ? 'vertical' : 'horizontal' 
+            }
         }
     });
 
