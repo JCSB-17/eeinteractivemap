@@ -413,3 +413,81 @@ body.dark-mode .btn-dark-mode {
 body.dark-mode .btn-dark-mode:hover {
     background-color: #5a5a5a;
 }
+
+.completed-box { background-color: #bdc3c7; border: 1px solid #7f8c8d; }
+
+.grad-tracker {
+    background-color: #e8f4f8;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.grad-tracker h3 {
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.tracker-subtext {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.completion-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.btn-success {
+    flex: 1;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.btn-success:hover { background-color: #219653; }
+
+.btn-warning {
+    flex: 1;
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.btn-warning:hover { background-color: #d68910; }
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.status-completed { background-color: #2ecc71; color: white; }
+.status-pending { background-color: #e74c3c; color: white; }
+
+body.dark-mode .grad-tracker {
+    background-color: #1a252f;
+    border-left-color: #2980b9;
+}
+
+body.dark-mode .grad-tracker h3 { color: #e0e0e0; }
+body.dark-mode .tracker-subtext { color: #aaa; }
