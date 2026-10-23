@@ -15,7 +15,7 @@ const nodes = new vis.DataSet(
             level: level,
             color: yearColors[course.year],
             shape: 'box',
-            font: { face: 'monospace', align: 'center' },
+            font: { face: 'monospace', align: 'center', color: '#000000' },
             hidden: false
         };
     })
@@ -93,9 +93,14 @@ const multiSelectToggle = document.getElementById('multi-select-toggle');
 const multiSelectInfo = document.getElementById('multi-select-info');
 const selectedCoursesList = document.getElementById('selected-courses-list');
 const clearSelectionBtn = document.getElementById('clear-selection-btn');
+const darkModeToggle = document.getElementById('dark-mode-toggle');
 
 let isMultiSelectMode = false;
 let activeNodes = [];
+
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+});
 
 multiSelectToggle.addEventListener('click', () => {
     isMultiSelectMode = !isMultiSelectMode;
